@@ -7,8 +7,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 public class ToolsUtil {
     private static boolean hasSDCard = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
@@ -16,12 +20,36 @@ public class ToolsUtil {
     private static String getAppDir() {
 
         if (hasSDCard) { // SD卡根目录的hello.text
-            return Environment.getExternalStorageDirectory() + "/upgrade_apk";
+            return Environment.getExternalStorageDirectory() + "/upgrade_apk/";
         } else {  // 系统下载缓存根目录的hello.text
-            return Environment.getDownloadCacheDirectory() + "/upgrade_apk";
+            return Environment.getDownloadCacheDirectory() + "/upgrade_apk/";
         }
     }
+    public static void copyFile(String oldPath, String newPath) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            File oldfile = new File(oldPath);
+            if (oldfile.exists()) { //文件存在时
+                InputStream inStream = new FileInputStream
+                        (oldPath); //读入原文件
+                FileOutputStream fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1444];
+                int length;
+                while ( (byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread; //字节数 文件大小
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+            }
+        }
+        catch (Exception e) {
+            System.out.println("复制单个文件操作出错");
+            e.printStackTrace();
 
+        }
+
+    }
     private static String mkdirs(String dir) {
         File file = new File(dir);
         if (!file.exists()) {
@@ -31,7 +59,7 @@ public class ToolsUtil {
     }
 
     public static String getApkDir() {
-        String dir = getAppDir() + "/apk/";
+        String dir = getAppDir() ;
         return mkdirs(dir);
     }
 
@@ -47,6 +75,12 @@ public class ToolsUtil {
             return;
         }
         File file = new File(apkPath);
+
+        if (file.exists()){
+            Log.v("xhw","file exit");
+        }else{
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
         //判读版本是否在7.0以上
