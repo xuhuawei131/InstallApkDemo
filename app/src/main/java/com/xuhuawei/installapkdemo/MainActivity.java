@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         btn_install.setOnClickListener(listener);
 
 
-        cachePath = getExternalFilesDir("upgrade_apk") + File.separator + getPackageName() + ".apk";
+        cachePath = getExternalFilesDir("upgrade_apk") + File.separator + getPackageName() + "DTMFRecognizerKey.apk";
 
     }
 
@@ -60,11 +60,12 @@ public class MainActivity extends AppCompatActivity {
                 onSettingCheckUpdate();
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            cachePath = getExternalFilesDir("bga_upgrade_apk") + File.separator + "DTMFRecognizerKey.apk";
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             Uri contentUri = FileProvider.getUriForFile(getBaseContext(), BuildConfig.APPLICATION_ID + ".fileProvider", apkFile);
             intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
         } else {
-            intent.setDataAndType(Uri.fromFile(new File("apk地址")), "application/vnd.android.package-archive");
+            intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         startActivity(intent);
