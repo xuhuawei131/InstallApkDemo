@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
@@ -65,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            cachePath = getExternalFilesDir("bga_upgrade_apk") + File.separator + "DTMFRecognizerKey.apk";
+            File cachePath=new File( Environment.getExternalStorageDirectory()+"/bga_upgrade_apk","DTMFRecognizerKey.apk");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Uri contentUri = FileProvider.getUriForFile(getBaseContext(), BuildConfig.APPLICATION_ID + ".fileProvider", apkFile);
+            Uri contentUri = FileProvider.getUriForFile(getBaseContext(), BuildConfig.APPLICATION_ID + ".fileProvider", cachePath);
             intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
         } else {
             intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
