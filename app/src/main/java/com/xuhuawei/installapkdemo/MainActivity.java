@@ -45,21 +45,26 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void installApk(File apkFile) {
-
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             boolean hasInstallPermission = isHasInstallPermissionWithO();
             if (!hasInstallPermission) {
                 startInstallPermissionSettingActivity();
                 return;
             } else {
-                onSettingCheckUpdate();
+                instalApk(apkFile);
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        } else{
+            instalApk(apkFile);
+        }
+    }
+
+    private void instalApk(File apkFile){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             cachePath = getExternalFilesDir("bga_upgrade_apk") + File.separator + "DTMFRecognizerKey.apk";
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             Uri contentUri = FileProvider.getUriForFile(getBaseContext(), BuildConfig.APPLICATION_ID + ".fileProvider", apkFile);
@@ -70,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivity(intent);
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private boolean isHasInstallPermissionWithO() {
