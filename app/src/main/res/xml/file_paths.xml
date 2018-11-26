@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <external-path name="bga_upgrade_apk" path="upgrade_apk" />
-    <!--<external-path name="CacheCarSystem" path="CarSystem"/>-->
+    <!--<external-path name="bga_upgrade_apk" path="upgrade_apk" />-->
+    <cache-path name="bga_upgrade_apk" path="upgrade_apk" />
 </paths>

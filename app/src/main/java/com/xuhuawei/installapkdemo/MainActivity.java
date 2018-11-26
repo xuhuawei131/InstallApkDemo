@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_APP_INSTALL = 1;
     private View btn_install;
 
-
+    private File destFile;
 
     private String cachePath;
     @Override
@@ -35,15 +35,17 @@ public class MainActivity extends AppCompatActivity {
         btn_install.setOnClickListener(listener);
 
 
-        cachePath = getExternalFilesDir("upgrade_apk") + File.separator + getPackageName() + "DTMFRecognizerKey.apk";
+        File cachePath=new File( Environment.getExternalStorageDirectory()+"/upgrade_apk","DTMFRecognizerKey.apk");
+
+
 
     }
 
     private View.OnClickListener listener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            File cachePath=new File( Environment.getExternalStorageDirectory()+"/upgrade_apk","DTMFRecognizerKey.apk");
-            if (cachePath.exists()){
+
+            if (destFile.exists()){
                 checkIsAndroidO();
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //                    boolean hasInstallPermission = isHasInstallPermissionWithO();

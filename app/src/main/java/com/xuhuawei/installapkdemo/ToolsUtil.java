@@ -52,7 +52,7 @@ public class ToolsUtil {
         //判读版本是否在7.0以上
         if (Build.VERSION.SDK_INT >= 24) {
             //provider authorities
-            Uri apkUri = FileProvider.getUriForFile(context, context.getPackageName(), file);
+            Uri apkUri = FileProvider.getUriForFile(context.getApplicationContext(), BuildConfig.APPLICATION_ID+".file_provider", file);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
