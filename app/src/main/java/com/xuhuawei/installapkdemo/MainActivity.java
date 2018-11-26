@@ -43,25 +43,19 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             File cachePath=new File( Environment.getExternalStorageDirectory()+"/upgrade_apk","DTMFRecognizerKey.apk");
             if (cachePath.exists()){
-                installApk(cachePath);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    boolean hasInstallPermission = isHasInstallPermissionWithO();
+                    if (!hasInstallPermission) {
+                        startInstallPermissionSettingActivity();
+                    } else {
+                        instalApk(cachePath);
+                    }
+                } else{
+                    instalApk(cachePath);
+                }
             }
         }
     };
-
-
-    private void installApk(File apkFile) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            boolean hasInstallPermission = isHasInstallPermissionWithO();
-            if (!hasInstallPermission) {
-                startInstallPermissionSettingActivity();
-                return;
-            } else {
-                instalApk(apkFile);
-            }
-        } else{
-            instalApk(apkFile);
-        }
-    }
 
     private void instalApk(File apkFile){
         Intent intent = new Intent(Intent.ACTION_VIEW);
