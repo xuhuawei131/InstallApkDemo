@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.io.File;
@@ -43,23 +44,23 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             File cachePath=new File( Environment.getExternalStorageDirectory()+"/upgrade_apk","DTMFRecognizerKey.apk");
             if (cachePath.exists()){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    boolean hasInstallPermission = isHasInstallPermissionWithO();
-                    if (!hasInstallPermission) {
-                        startInstallPermissionSettingActivity();
-                    } else {
-                        instalApk(cachePath);
-                    }
-                } else{
-                    instalApk(cachePath);
-                }
+                checkIsAndroidO();
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    boolean hasInstallPermission = isHasInstallPermissionWithO();
+//                    if (!hasInstallPermission) {
+//                        startInstallPermissionSettingActivity();
+//                    } else {
+//                        instalApk(cachePath);
+//                    }
+//                } else{
+//                    instalApk(cachePath);
+//                }
             }
         }
     };
 
     private void instalApk(File apkFile){
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setAction(Intent.ACTION_VIEW);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -74,6 +75,26 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivity(intent);
     }
+
+
+    private void checkIsAndroidO() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            boolean b = getPackageManager().canRequestPackageInstalls();
+            if (b) {
+                ToolsUtil.installApk(MainActivity.this, ToolsUtil.getApkDir() + ToolsUtil.getApplicationName() + ".apk");
+                //安装应用的逻辑(写自己的就可以)
+            } else {
+                //设置安装未知应用来源的权限
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                startActivityForResult(intent, REQUEST_CODE_APP_INSTALL);
+            }
+        } else {
+            ToolsUtil.installApk(MainActivity.this, ToolsUtil.getApkDir() + ToolsUtil.getApplicationName() + ".apk");
+        }
+    }
+
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private boolean isHasInstallPermissionWithO() {
@@ -96,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_CODE_APP_INSTALL:
-                    onSettingCheckUpdate();
+                    checkIsAndroidO();
                     break;
             }
         }
@@ -117,8 +138,4 @@ public class MainActivity extends AppCompatActivity {
 //
 //        }
 //    }
-
-    private void onSettingCheckUpdate() {
-
-    }
 }
