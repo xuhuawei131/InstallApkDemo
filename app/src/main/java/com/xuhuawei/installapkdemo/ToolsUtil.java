@@ -25,6 +25,33 @@ public class ToolsUtil {
             return Environment.getDownloadCacheDirectory() + "/upgrade_apk/";
         }
     }
+
+
+    /**
+     * @param myContext
+     * @param ASSETS_NAME 要复制的文件名
+     * @param destFile    要保存的路径
+     */
+    public static void copyAssets(Context myContext, String ASSETS_NAME, File destFile) {
+        try {
+            if (!destFile.exists()) {
+                InputStream is = myContext.getResources().getAssets()
+                        .open(ASSETS_NAME);
+                FileOutputStream fos = new FileOutputStream(destFile);
+                byte[] buffer = new byte[7168];
+                int count = 0;
+                while ((count = is.read(buffer)) > 0) {
+                    fos.write(buffer, 0, count);
+                }
+                fos.close();
+                is.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void copyFile(String oldPath, String newPath) {
         try {
             int bytesum = 0;
@@ -36,20 +63,20 @@ public class ToolsUtil {
                 FileOutputStream fs = new FileOutputStream(newPath);
                 byte[] buffer = new byte[1444];
                 int length;
-                while ( (byteread = inStream.read(buffer)) != -1) {
+                while ((byteread = inStream.read(buffer)) != -1) {
                     bytesum += byteread; //字节数 文件大小
                     fs.write(buffer, 0, byteread);
                 }
                 inStream.close();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("复制单个文件操作出错");
             e.printStackTrace();
 
         }
 
     }
+
     private static String mkdirs(String dir) {
         File file = new File(dir);
         if (!file.exists()) {
@@ -59,7 +86,7 @@ public class ToolsUtil {
     }
 
     public static String getApkDir() {
-        String dir = getAppDir() ;
+        String dir = getAppDir();
         return mkdirs(dir);
     }
 
@@ -70,15 +97,15 @@ public class ToolsUtil {
      * @param context
      * @param apkPath
      */
-    public  static void installApk(Context context, String apkPath) {
+    public static void installApk(Context context, String apkPath) {
         if (context == null || TextUtils.isEmpty(apkPath)) {
             return;
         }
         File file = new File(apkPath);
 
-        if (file.exists()){
-            Log.v("xhw","file exit");
-        }else{
+        if (file.exists()) {
+            Log.v("xhw", "file exit");
+        } else {
             return;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -86,7 +113,7 @@ public class ToolsUtil {
         //判读版本是否在7.0以上
         if (Build.VERSION.SDK_INT >= 24) {
             //provider authorities
-            Uri apkUri = FileProvider.getUriForFile(context.getApplicationContext(), BuildConfig.APPLICATION_ID+".file_provider", file);
+            Uri apkUri = FileProvider.getUriForFile(context.getApplicationContext(), BuildConfig.APPLICATION_ID + ".file_provider", file);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
