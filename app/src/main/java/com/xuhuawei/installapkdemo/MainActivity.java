@@ -18,6 +18,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 
+import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_APP_INSTALL = 1;
@@ -42,25 +44,22 @@ public class MainActivity extends AppCompatActivity {
             } //申请权限
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
         } else {
+            copyCacheApk();
 
-            File dir=new File(getCacheDir() + "/upgrade_apk/");
-            if (!dir.exists()){
-                dir.mkdirs();
-            }
+        }
+    }
 
-            File desFile = new File(dir, ToolsUtil.getApplicationName());
-            if (!desFile.exists()) {
-                try {
-                    desFile.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                ToolsUtil.copyAssets(getBaseContext(),"DTMFRecognizerKey.apk",desFile);
-                destFile = desFile;
-            } else {
-                destFile = desFile;
-            }
-            Toast.makeText(this, "授权成功！", Toast.LENGTH_SHORT).show();
+    private void copyCacheApk(){
+        File dir=new File(getCacheDir() + "/upgrade_apk/");
+        if (!dir.exists()){
+            dir.mkdirs();
+        }
+        File desFile = new File(dir, ToolsUtil.getApplicationName());
+        if (!desFile.exists()) {
+            ToolsUtil.copyAssets(getBaseContext(),ToolsUtil.getApplicationName(),desFile);
+            destFile = desFile;
+        } else {
+            destFile = desFile;
         }
     }
 
@@ -78,13 +77,30 @@ public class MainActivity extends AppCompatActivity {
                 //安装应用的逻辑(写自己的就可以)
             } else {
                 //设置安装未知应用来源的权限
-                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                Uri packageURI = Uri.parse("package:" + getPackageName());
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,packageURI);
                 startActivityForResult(intent, REQUEST_CODE_APP_INSTALL);
             }
         } else {
             ToolsUtil.installApk(MainActivity.this, destFile.getAbsolutePath());
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] == PERMISSION_GRANTED) {
+                    if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                        copyCacheApk();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
